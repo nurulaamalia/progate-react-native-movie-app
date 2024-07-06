@@ -1,7 +1,7 @@
 // src/screens/Home.tsx
 
 import React from 'react';
-import { ScrollView, View, StatusBar, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StatusBar, StyleSheet } from 'react-native';
 import type { MovieListProps } from '../types/app';
 import MovieList from '../components/movies/MovieList';
 
@@ -33,12 +33,14 @@ const Home = (): JSX.Element => {
     <ScrollView>
       <View style={styles.container}>
         {movieLists.map((movieList) => (
-          <MovieList
-            title={movieList.title}
-            path={movieList.path}
-            coverType={movieList.coverType}
-            key={movieList.title}
-          />
+          <View key={movieList.title} style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{movieList.title}</Text>
+            <MovieList
+              title={movieList.title}
+              path={movieList.path}
+              coverType={movieList.coverType}
+            />
+          </View>
         ))}
         <StatusBar translucent={false} />
       </View>
@@ -49,9 +51,18 @@ const Home = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     marginTop: StatusBar.currentHeight ?? 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    rowGap: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  sectionContainer: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+    paddingLeft: 8,
   },
 });
 
