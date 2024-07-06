@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation, StackActions } from '@react-navigation/native';
-import { FontAwesome } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { MovieItemProps } from '../../types/app';
 
 const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
@@ -18,7 +16,6 @@ const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log(`Selected Movie ID: ${movie.id}`);
         navigation.dispatch(pushAction);
       }}
     >
@@ -32,17 +29,9 @@ const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
           }`,
         }}
       >
-        <LinearGradient
-          colors={['#00000000', 'rgba(0, 0, 0, 0.7)']}
-          locations={[0.6, 0.8]}
-          style={styles.gradientStyle}
-        >
+        <View style={styles.gradientStyle}>
           <Text style={styles.movieTitle}>{movie.title}</Text>
-          <View style={styles.ratingContainer}>
-            <FontAwesome name="star" size={16} color="yellow" />
-            <Text style={styles.rating}>{movie.vote_average.toFixed(1)}</Text>
-          </View>
-        </LinearGradient>
+        </View>
       </ImageBackground>
     </TouchableOpacity>
   );
@@ -65,15 +54,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     display: 'flex',
     justifyContent: 'flex-end',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  rating: {
-    color: 'yellow',
-    fontWeight: '700',
   },
 });
 
