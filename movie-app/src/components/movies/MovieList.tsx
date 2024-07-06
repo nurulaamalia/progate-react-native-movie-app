@@ -1,3 +1,4 @@
+// src/components/movies/MovieList.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import type { MovieListProps, Movie } from '../../types/app';
@@ -23,7 +24,6 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
   }, []);
 
   const getMovieList = (): void => {
-    console.log('Fetching data from path:', path);
     const url = `https://api.themoviedb.org/3/${path}`;
     const options = {
       method: 'GET',
@@ -36,7 +36,6 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
     fetch(url, options)
       .then(async (response) => await response.json())
       .then((response) => {
-        console.log('Movies:', response.results);
         setMovies(response.results);
       })
       .catch((errorResponse) => {
