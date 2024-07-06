@@ -1,47 +1,36 @@
 // src/components/movies/MovieList.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import type { MovieListProps, Movie } from '../../types/app';
 import { API_ACCESS_TOKEN } from '@env';
 import MovieItem from './MovieItem';
-
-const coverImageSize = {
-  backdrop: {
-    width: 280,
-    height: 160,
-  },
-  poster: {
-    width: 100,
-    height: 160,
-  },
-};
 
 const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
   const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    getMovieList();
-  }, []);
+    const getMovieList = async (): Promise<void> => {
+      const url = `https://api.themoviedb.org/3/${path}`;
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${API_ACCESS_TOKEN}`,
+        },
+      };
 
-  const getMovieList = (): void => {
-    const url = `https://api.themoviedb.org/3/${path}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${API_ACCESS_TOKEN}`,
-      },
+      try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        setMovies(data.results);
+      } catch (error) {
+        console.error('Error fetching movie list:', error);
+      }
     };
 
-    fetch(url, options)
-      .then(async (response) => await response.json())
-      .then((response) => {
-        setMovies(response.results);
-      })
-      .catch((errorResponse) => {
-        console.log(errorResponse);
-      });
-  };
+    getMovieList();
+  }, [path]);
 
   return (
     <View>
@@ -52,7 +41,7 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
       <FlatList
         style={{
           ...styles.movieList,
-          maxHeight: coverImageSize[coverType].height,
+          maxHeight: coverType === 'backdrop' ? 160 : 160,
         }}
         showsHorizontalScrollIndicator={false}
         horizontal
@@ -60,7 +49,10 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
         renderItem={({ item }) => (
           <MovieItem
             movie={item}
-            size={coverImageSize[coverType]}
+            size={{
+              width: coverType === 'backdrop' ? 280 : 100,
+              height: 160,
+            }}
             coverType={coverType}
           />
         )}

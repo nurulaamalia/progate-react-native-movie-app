@@ -1,12 +1,16 @@
-// App.tsx
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
-import BottomTabNavigator from './src/navigations/BottomTabNavigation'
+// src/App.tsx
 
-export default function App(): JSX.Element {
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import BottomTabNavigation from './src/navigations/BottomTabNavigation';
+
+const App = (): JSX.Element => {
   return (
     <NavigationContainer>
-      <BottomTabNavigator />
+      <BottomTabNavigation />
     </NavigationContainer>
-  )
-}
+  );
+};
+
+export default App;

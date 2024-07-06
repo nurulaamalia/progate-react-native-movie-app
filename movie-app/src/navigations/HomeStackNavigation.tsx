@@ -1,16 +1,27 @@
-// src/navigations/HomeStackNavigation.tsx
+// src/navigations/HomeStackNavigator.tsx
+
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from '../screens/Home';
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from '../screens/Home';
 import MovieDetail from '../screens/MovieDetail';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
-const HomeStackNavigator = (): JSX.Element => (
-  <Stack.Navigator>
-    <Stack.Screen name="Home" component={Home} />
-    <Stack.Screen name="MovieDetail" component={MovieDetail} />
-  </Stack.Navigator>
-);
+const HomeStackNavigator = (): JSX.Element => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ title: 'Home' }} 
+      />
+      <Stack.Screen 
+        name="MovieDetail" 
+        component={MovieDetail}
+        options={{ title: 'Movie Detail' }} // Ensure the title is set here
+      />
+    </Stack.Navigator>
+  );
+};
 
 export default HomeStackNavigator;
