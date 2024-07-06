@@ -1,15 +1,11 @@
 // src/components/movies/MovieItem.tsx
 
 import React from 'react';
-import {
-  ImageBackground,
-  Text,
-  StyleSheet,
-  View,
-  TouchableOpacity, 
-} from 'react-native';
-import { useNavigation, StackActions } from '@react-navigation/native';
+import { ImageBackground, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome
+import { LinearGradient } from 'expo-linear-gradient';
 import type { MovieItemProps } from '../../types/app';
+import { useNavigation, StackActions } from '@react-navigation/native';
 
 const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
   const navigation = useNavigation();
@@ -31,12 +27,17 @@ const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
           }`,
         }}
       >
-        <View style={styles.gradientStyle}>
+        <LinearGradient
+          colors={['#00000000', 'rgba(0, 0, 0, 0.7)']}
+          locations={[0.6, 0.8]}
+          style={styles.gradientStyle}
+        >
           <Text style={styles.movieTitle}>{movie.title}</Text>
           <View style={styles.ratingContainer}>
+            <FontAwesome name="star" size={16} color="gold" />
             <Text style={styles.rating}>{movie.vote_average.toFixed(1)}</Text>
           </View>
-        </View>
+        </LinearGradient>
       </ImageBackground>
     </TouchableOpacity>
   );
@@ -51,9 +52,6 @@ const styles = StyleSheet.create({
   },
   movieTitle: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
   },
   gradientStyle: {
     padding: 8,
