@@ -1,6 +1,11 @@
-// src/components/movies/MovieItem.tsx
 import React from 'react';
-import { ImageBackground, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import {
+  ImageBackground,
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import { useNavigation, StackActions } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,13 +15,13 @@ const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
   const navigation = useNavigation();
   const pushAction = StackActions.push('MovieDetail', { id: movie.id });
 
-  const handlePress = () => {
-    console.log(`Selected Movie ID: ${movie.id}`);
-    navigation.dispatch(pushAction);
-  };
-
   return (
-    <TouchableOpacity onPress={handlePress}>
+    <TouchableOpacity
+      onPress={() => {
+        console.log(`Selected Movie ID: ${movie.id}`);
+        navigation.dispatch(pushAction);
+      }}
+    >
       <ImageBackground
         resizeMode="cover"
         style={[size, styles.backgroundImage]}

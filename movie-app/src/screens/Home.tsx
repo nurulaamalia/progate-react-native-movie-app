@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, StatusBar, StyleSheet } from 'react-native';
-import type { MovieListProps } from '../types/app';
+import { API_URL, API_ACCESS_TOKEN } from '@env';
+import type { Movie } from '../types/app';
 import MovieList from '../components/movies/MovieList';
 
-const movieLists: MovieListProps[] = [
+const movieCategories: { title: string; path: string; coverType: 'poster' | 'backdrop'; }[] = [
   {
     title: 'Now Playing in Theater',
     path: 'movie/now_playing?language=en-US&page=1',
@@ -27,15 +28,45 @@ const movieLists: MovieListProps[] = [
 ];
 
 const Home = (): JSX.Element => {
+  const [movies, setMovies] = useState<{ [key: string]: Movie[] }>({});
+
+  useEffect(() => {
+    movieCategories.forEach((category) => {
+      fetchMovies(category.path, category.title);
+    });
+  }, []);
+
+  const fetchMovies = async (path: string, category: string) => {
+    const url = `${API_URL}/${path}`;
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${API_ACCESS_TOKEN}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      setMovies((prevState) => ({
+        ...prevState,
+        [category]: data.results,
+      }));
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+    }
+  };
+
   return (
     <ScrollView>
       <View style={styles.container}>
-        {movieLists.map((movieList) => (
+        {movieCategories.map((category) => (
           <MovieList
-            title={movieList.title}
-            path={movieList.path}
-            coverType={movieList.coverType}
-            key={movieList.title}
+            key={category.title}
+            title={category.title}
+            path={category.path}
+            coverType={category.coverType}
           />
         ))}
         <StatusBar translucent={false} />
