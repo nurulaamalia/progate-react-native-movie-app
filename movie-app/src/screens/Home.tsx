@@ -1,4 +1,5 @@
 // src/screens/Home.tsx
+
 import React from 'react';
 import { ScrollView, View, StatusBar, StyleSheet } from 'react-native';
 import type { MovieListProps } from '../types/app';

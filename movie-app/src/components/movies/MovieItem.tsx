@@ -1,10 +1,12 @@
+// src/components/movies/MovieItem.tsx
+
 import React from 'react';
 import {
   ImageBackground,
   Text,
   StyleSheet,
   View,
-  TouchableOpacity,
+  TouchableOpacity, 
 } from 'react-native';
 import { useNavigation, StackActions } from '@react-navigation/native';
 import type { MovieItemProps } from '../../types/app';
@@ -31,6 +33,9 @@ const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
       >
         <View style={styles.gradientStyle}>
           <Text style={styles.movieTitle}>{movie.title}</Text>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.rating}>{movie.vote_average.toFixed(1)}</Text>
+          </View>
         </View>
       </ImageBackground>
     </TouchableOpacity>
@@ -46,6 +51,9 @@ const styles = StyleSheet.create({
   },
   movieTitle: {
     color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
   gradientStyle: {
     padding: 8,
@@ -54,6 +62,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     display: 'flex',
     justifyContent: 'flex-end',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  rating: {
+    color: 'yellow',
+    fontWeight: '700',
   },
 });
 
