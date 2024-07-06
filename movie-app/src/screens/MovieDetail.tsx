@@ -2,22 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL, API_ACCESS_TOKEN } from '@env';
 import { MovieDetailScreenProps } from '../types/navigation';
 import MovieItem from '../components/movies/MovieItem';
+import { useFavorites } from '../context/FavoritesContext';
+import { FontAwesome } from '@expo/vector-icons';
 
 const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element => {
   const { id } = route.params;
   const [movieDetails, setMovieDetails] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+
+  const isFavorite = favorites.some(movie => movie.id === id);
 
   useEffect(() => {
     fetchMovieDetails();
     fetchRecommendations();
-    checkIsFavorite(id);
   }, []);
 
   const fetchMovieDetails = async () => {
@@ -58,35 +59,11 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
     }
   };
 
-  const checkIsFavorite = async (movieId: number) => {
-    try {
-      const favoriteList = await AsyncStorage.getItem('@FavoriteList');
-      if (favoriteList !== null) {
-        const favorites = JSON.parse(favoriteList);
-        const isFav = favorites.some((movie: any) => movie.id === movieId);
-        setIsFavorite(isFav);
-      }
-    } catch (error) {
-      console.error('Error checking favorite status:', error);
-    }
-  };
-
-  const toggleFavorite = async () => {
-    try {
-      const favoriteList = await AsyncStorage.getItem('@FavoriteList');
-      let favorites = favoriteList !== null ? JSON.parse(favoriteList) : [];
-      
-      if (isFavorite) {
-        favorites = favorites.filter((movie: any) => movie.id !== id);
-        setIsFavorite(false);
-      } else {
-        favorites.push(movieDetails);
-        setIsFavorite(true);
-      }
-
-      await AsyncStorage.setItem('@FavoriteList', JSON.stringify(favorites));
-    } catch (error) {
-      console.error('Error toggling favorite status:', error);
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      removeFavorite(id);
+    } else {
+      addFavorite(movieDetails);
     }
   };
 
@@ -101,16 +78,14 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={styles.posterContainer}>
-          <Image
-            source={{ uri: `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` }}
-            style={styles.poster}
-          />
-          <TouchableOpacity style={styles.favoriteIcon} onPress={toggleFavorite}>
-            <Ionicons name={isFavorite ? 'heart' : 'heart-outline'} size={30} color="red" />
-          </TouchableOpacity>
-        </View>
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` }}
+          style={styles.poster}
+        />
         <Text style={styles.title}>{movieDetails.title}</Text>
+        <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteIcon}>
+          <FontAwesome name={isFavorite ? 'heart' : 'heart-o'} size={24} color="red" />
+        </TouchableOpacity>
         <Text style={styles.tagline}>{movieDetails.tagline}</Text>
         <Text style={styles.overview}>{movieDetails.overview}</Text>
 
@@ -146,19 +121,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  posterContainer: {
-    position: 'relative',
-  },
   poster: {
     width: 300,
     height: 450,
     borderRadius: 8,
     marginBottom: 16,
-  },
-  favoriteIcon: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
   },
   title: {
     fontSize: 24,
@@ -188,6 +155,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 16,
     marginBottom: 8,
+  },
+  favoriteIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
   },
 });
 
