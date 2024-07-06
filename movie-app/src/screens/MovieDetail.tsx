@@ -1,19 +1,23 @@
 // src/screens/MovieDetail.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, ScrollView, Linking, FlatList } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL, API_ACCESS_TOKEN } from '@env';
 import { MovieDetailScreenProps } from '../types/navigation';
-import MovieItem from '../components/movies/MovieItem'; // Ensure this component is correctly imported
+import MovieItem from '../components/movies/MovieItem';
 
 const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element => {
   const { id } = route.params;
   const [movieDetails, setMovieDetails] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   useEffect(() => {
     fetchMovieDetails();
     fetchRecommendations();
+    checkIsFavorite(id);
   }, []);
 
   const fetchMovieDetails = async () => {
@@ -54,6 +58,38 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
     }
   };
 
+  const checkIsFavorite = async (movieId: number) => {
+    try {
+      const favoriteList = await AsyncStorage.getItem('@FavoriteList');
+      if (favoriteList !== null) {
+        const favorites = JSON.parse(favoriteList);
+        const isFav = favorites.some((movie: any) => movie.id === movieId);
+        setIsFavorite(isFav);
+      }
+    } catch (error) {
+      console.error('Error checking favorite status:', error);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    try {
+      const favoriteList = await AsyncStorage.getItem('@FavoriteList');
+      let favorites = favoriteList !== null ? JSON.parse(favoriteList) : [];
+      
+      if (isFavorite) {
+        favorites = favorites.filter((movie: any) => movie.id !== id);
+        setIsFavorite(false);
+      } else {
+        favorites.push(movieDetails);
+        setIsFavorite(true);
+      }
+
+      await AsyncStorage.setItem('@FavoriteList', JSON.stringify(favorites));
+    } catch (error) {
+      console.error('Error toggling favorite status:', error);
+    }
+  };
+
   if (!movieDetails) {
     return (
       <View style={styles.loadingContainer}>
@@ -65,10 +101,15 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Image
-          source={{ uri: `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` }}
-          style={styles.poster}
-        />
+        <View style={styles.posterContainer}>
+          <Image
+            source={{ uri: `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` }}
+            style={styles.poster}
+          />
+          <TouchableOpacity style={styles.favoriteIcon} onPress={toggleFavorite}>
+            <Ionicons name={isFavorite ? 'heart' : 'heart-outline'} size={30} color="red" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.title}>{movieDetails.title}</Text>
         <Text style={styles.tagline}>{movieDetails.tagline}</Text>
         <Text style={styles.overview}>{movieDetails.overview}</Text>
@@ -105,11 +146,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  posterContainer: {
+    position: 'relative',
+  },
   poster: {
     width: 300,
     height: 450,
     borderRadius: 8,
     marginBottom: 16,
+  },
+  favoriteIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   title: {
     fontSize: 24,
@@ -133,10 +182,6 @@ const styles = StyleSheet.create({
   details: {
     fontSize: 14,
     marginBottom: 8,
-  },
-  link: {
-    color: 'blue',
-    textDecorationLine: 'underline',
   },
   recommendationTitle: {
     fontSize: 20,
