@@ -8,7 +8,7 @@ export default function Home({ navigation }: any): JSX.Element {
       <Text>Movie Page</Text>
       <Button
         title="PERGI KE MOVIEDETAIL"
-        onPress={() => navigation.navigate('MovieDetail')}
+        onPress={() => navigation.navigate('MovieDetail')} 
       />
     </View>
   )
