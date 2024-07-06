@@ -1,15 +1,20 @@
 // src/screens/MovieDetail.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, ScrollView, Linking, FlatList } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { API_URL, API_ACCESS_TOKEN } from '@env';
 import { MovieDetailScreenProps } from '../types/navigation';
-import MovieItem from '../components/movies/MovieItem'; // Ensure this component is correctly imported
+import MovieItem from '../components/movies/MovieItem';
+import { useFavorites } from '../context/FavoritesContext';
+import { FontAwesome } from '@expo/vector-icons';
 
 const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element => {
   const { id } = route.params;
   const [movieDetails, setMovieDetails] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+
+  const isFavorite = favorites.some(movie => movie.id === id);
 
   useEffect(() => {
     fetchMovieDetails();
@@ -54,6 +59,14 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
     }
   };
 
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      removeFavorite(id);
+    } else {
+      addFavorite(movieDetails);
+    }
+  };
+
   if (!movieDetails) {
     return (
       <View style={styles.loadingContainer}>
@@ -70,6 +83,9 @@ const MovieDetail = ({ route, navigation }: MovieDetailScreenProps): JSX.Element
           style={styles.poster}
         />
         <Text style={styles.title}>{movieDetails.title}</Text>
+        <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteIcon}>
+          <FontAwesome name={isFavorite ? 'heart' : 'heart-o'} size={24} color="red" />
+        </TouchableOpacity>
         <Text style={styles.tagline}>{movieDetails.tagline}</Text>
         <Text style={styles.overview}>{movieDetails.overview}</Text>
 
@@ -134,15 +150,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
   },
-  link: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
   recommendationTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 16,
     marginBottom: 8,
+  },
+  favoriteIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
   },
 });
 

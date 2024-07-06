@@ -1,15 +1,17 @@
 // src/App.tsx
 
-import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTabNavigation from './src/navigations/BottomTabNavigation';
+import { FavoritesProvider } from './src/context/FavoritesContext';
 
 const App = (): JSX.Element => {
   return (
-    <NavigationContainer>
-      <BottomTabNavigation />
-    </NavigationContainer>
+    <FavoritesProvider>
+      <NavigationContainer>
+        <BottomTabNavigation />
+      </NavigationContainer>
+    </FavoritesProvider>
   );
 };
 
